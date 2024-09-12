@@ -1,18 +1,13 @@
 import streamlit as st
+from openai import OpenAI
 import json
 import numpy as np
-from openai import OpenAI
-from dotenv import load_dotenv
-import os
 
 # Set page config at the very beginning
 st.set_page_config(page_title="Facets Documentation Q&A", page_icon="🤖", layout="wide")
 
-# Load environment variables
-load_dotenv()
-
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Initialize OpenAI client using st.secrets
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 # Load the embedded data
 @st.cache_data
@@ -60,11 +55,6 @@ Answer:"""
 # Streamlit UI
 st.title("Facets Documentation Q&A")
 
-st.markdown("""
-    This app uses AI to answer questions about Facets based on the documentation.
-    Simply type your question below and get an answer generated from the embedded documentation.
-""")
-
 query = st.text_input("Ask a question about Facets:")
 
 if query:
@@ -77,25 +67,11 @@ if query:
     with st.spinner("Generating answer..."):
         answer = generate_answer(query, context)
         
-    st.markdown("### Answer:")
-    st.write(answer)
+    st.write("Answer:", answer)
     
-    st.markdown("### Sources:")
+    st.subheader("Sources:")
     for _, content, url in most_similar:
         st.write(f"- [{url}]({url})")
 
     if st.checkbox("Show used context"):
         st.text_area("Context used for answering:", context, height=300)
-
-st.sidebar.markdown("""
-    ## How it works
-    1. Your question is converted into an embedding.
-    2. The most similar content from the Facets documentation is found.
-    3. An AI model uses this content to generate an answer to your question.
-    4. The sources of the information are provided for reference.
-""")
-
-st.sidebar.info(
-    "Note: This Q&A system is based on pre-processed documentation. "
-    "It may not have information about very recent updates or changes to Facets."
-)
