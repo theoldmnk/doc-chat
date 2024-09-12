@@ -55,6 +55,20 @@ Answer:"""
 # Streamlit UI
 st.title("Facets Documentation Q&A")
 
+# Add the explainer in the sidebar
+st.sidebar.markdown("""
+    ## How it works
+    1. Your question is converted into an embedding.
+    2. The most similar content from the Facets documentation is found.
+    3. An AI model uses this content to generate an answer to your question.
+    4. The sources of the information are provided for reference.
+""")
+
+st.sidebar.info(
+    "Note: This Q&A system is based on pre-processed documentation. "
+    "It may not have information about very recent updates or changes to Facets."
+)
+
 query = st.text_input("Ask a question about Facets:")
 
 if query:
@@ -67,9 +81,10 @@ if query:
     with st.spinner("Generating answer..."):
         answer = generate_answer(query, context)
         
-    st.write("Answer:", answer)
+    st.markdown("### Answer:")
+    st.write(answer)
     
-    st.subheader("Sources:")
+    st.markdown("### Sources:")
     for _, content, url in most_similar:
         st.write(f"- [{url}]({url})")
 
